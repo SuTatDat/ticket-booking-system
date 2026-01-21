@@ -1,0 +1,8 @@
+dependencies {
+    implementation project(':common-lib')
+    implementation project(':event-lib')
+}
+
+springBoot {
+    mainClass = 'com.ticketbooking.inventory.InventoryServiceApplication'
+}

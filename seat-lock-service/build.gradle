@@ -1,0 +1,9 @@
+dependencies {
+    implementation project(':common-lib')
+    implementation project(':event-lib')
+    implementation 'org.redisson:redisson-spring-boot-starter:3.27.2'
+}
+
+springBoot {
+    mainClass = 'com.ticketbooking.seatlock.SeatLockServiceApplication'
+}

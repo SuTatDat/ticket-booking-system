@@ -1,0 +1,9 @@
+dependencies {
+    implementation project(':common-lib')
+    implementation project(':event-lib')
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+}
+
+springBoot {
+    mainClass = 'com.ticketbooking.websocket.WebSocketServiceApplication'
+}

@@ -1,0 +1,14 @@
+plugins {
+    id 'java-library'
+}
+
+bootJar { enabled = false }
+jar { enabled = true }
+
+dependencies {
+    api project(':common-lib')
+    api 'com.fasterxml.jackson.core:jackson-databind'
+    api 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+}

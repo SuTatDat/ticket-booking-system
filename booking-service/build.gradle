@@ -1,0 +1,40 @@
+dependencies {
+    implementation project(':common-lib')
+    implementation project(':event-lib')
+
+    // Spring Boot starters
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // Kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+
+    // OpenAPI/Swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+    // MapStruct
+    implementation 'org.mapstruct:mapstruct:1.6.3'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+    // Resilience4j for Circuit Breaker
+    implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.2.0'
+
+    // OpenFeign for service-to-service communication
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.1'
+
+    // Redisson for distributed locks
+    implementation 'org.redisson:redisson-spring-boot-starter:3.27.2'
+
+    // Micrometer for metrics
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+
+    // Database
+    runtimeOnly 'com.mysql:mysql-connector-j'
+}
+
+springBoot {
+    mainClass = 'com.ticketbooking.booking.BookingServiceApplication'
+}

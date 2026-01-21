@@ -1,0 +1,81 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.1' apply false
+    id 'io.spring.dependency-management' version '1.1.7' apply false
+}
+
+allprojects {
+    group = 'com.ticketbooking'
+    version = '1.0.0-SNAPSHOT'
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
+
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
+
+    ext {
+        set('springCloudVersion', "2024.0.0")
+        set('mapstructVersion', "1.6.3")
+        set('lombokMapstructBindingVersion', "0.2.0")
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        }
+    }
+
+    dependencies {
+        // Lombok
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+
+        // Testing
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
+
+    // Common tasks
+    tasks.register('printVersion') {
+        doLast {
+            println project.version
+        }
+    }
+}
+
+// Task to build all services
+tasks.register('buildAllServices') {
+    dependsOn subprojects.findAll { it.path.startsWith(':services:') }.collect { "${it.path}:build" }
+    doLast {
+        println 'All services built successfully!'
+    }
+}
+
+// Task to run tests for all services
+tasks.register('testAllServices') {
+    dependsOn subprojects.findAll { it.path.startsWith(':services:') }.collect { "${it.path}:test" }
+    doLast {
+        println 'All service tests completed!'
+    }
+}

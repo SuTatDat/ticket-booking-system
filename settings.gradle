@@ -1,0 +1,13 @@
+rootProject.name = 'ticket-booking-system'
+
+// Common libraries
+include 'common-lib'
+include 'event-lib'
+
+// Service modules
+include 'inventory-service'
+include 'booking-service'
+include 'seat-lock-service'
+include 'payment-service'
+include 'notification-service'
+include 'websocket-service'

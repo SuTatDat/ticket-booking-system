@@ -1,0 +1,116 @@
+# ====================================
+# Gradle
+# ====================================
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# ====================================
+# IDE - IntelliJ IDEA
+# ====================================
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# ====================================
+# IDE - Eclipse
+# ====================================
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+# ====================================
+# IDE - VS Code
+# ====================================
+.vscode/
+
+# ====================================
+# Java
+# ====================================
+*.class
+*.log
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+replay_pid*
+
+# ====================================
+# OS Generated
+# ====================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ====================================
+# Environment & Secrets
+# ====================================
+.env
+.env.local
+.env.*.local
+*.env
+application-local.yml
+application-local.properties
+application-secret.yml
+application-secret.properties
+
+# Credentials
+credentials.json
+**/secrets/
+*.pem
+*.key
+
+# ====================================
+# Docker
+# ====================================
+# Keep docker-compose files but ignore local overrides
+docker-compose.override.yml
+.docker/
+
+# ====================================
+# Logs
+# ====================================
+logs/
+*.log
+npm-debug.log*
+
+# ====================================
+# Test & Coverage
+# ====================================
+/coverage/
+*.lcov
+.nyc_output/
+test-results/
+**/target/surefire-reports/
+
+# ====================================
+# Misc
+# ====================================
+*.swp
+*.swo
+*~
+.cache/
+tmp/
+temp/

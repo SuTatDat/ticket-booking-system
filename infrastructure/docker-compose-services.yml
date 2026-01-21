@@ -1,0 +1,194 @@
+version: '3.8'
+
+# This file is used to deploy the microservices
+# Run infrastructure first: docker-compose -f docker-compose.yml up -d
+# Then run services: docker-compose -f docker-compose-services.yml up -d
+
+services:
+  # ===========================================
+  # MICROSERVICES
+  # ===========================================
+  
+  inventory-service:
+    build:
+      context: ..
+      dockerfile: inventory-service/Dockerfile
+    container_name: ticket-inventory-service
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: inventory_db
+      DB_USERNAME: ${MYSQL_USER:-ticketuser}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-ticketpass}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ticket-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  seat-lock-service:
+    build:
+      context: ..
+      dockerfile: seat-lock-service/Dockerfile
+    container_name: ticket-seat-lock-service
+    restart: unless-stopped
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    depends_on:
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - ticket-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  booking-service:
+    build:
+      context: ..
+      dockerfile: booking-service/Dockerfile
+    container_name: ticket-booking-service
+    restart: unless-stopped
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: booking_db
+      DB_USERNAME: ${MYSQL_USER:-ticketuser}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-ticketpass}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      INVENTORY_SERVICE_URL: http://inventory-service:8081
+      SEAT_LOCK_SERVICE_URL: http://seat-lock-service:8082
+      PAYMENT_SERVICE_URL: http://payment-service:8084
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      # TODO: Uncomment when services are ready
+      # inventory-service:
+      #   condition: service_healthy
+      # seat-lock-service:
+      #   condition: service_healthy
+    networks:
+      - ticket-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  payment-service:
+    build:
+      context: ../payment-service
+      dockerfile: Dockerfile
+    container_name: ticket-payment-service
+    restart: unless-stopped
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: payment_db
+      DB_USERNAME: ${MYSQL_USER:-ticketuser}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-ticketpass}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      STRIPE_API_KEY: ${STRIPE_API_KEY:-sk_test_xxx}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - ticket-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8084/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  notification-service:
+    build:
+      context: ../notification-service
+      dockerfile: Dockerfile
+    container_name: ticket-notification-service
+    restart: unless-stopped
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+      - ticket-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  websocket-service:
+    build:
+      context: ../websocket-service
+      dockerfile: Dockerfile
+    container_name: ticket-websocket-service
+    restart: unless-stopped
+    ports:
+      - "8086:8086"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    depends_on:
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - ticket-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  ticket-network:
+    external: true
+    name: infrastructure_ticket-network

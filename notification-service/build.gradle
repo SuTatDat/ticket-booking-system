@@ -1,0 +1,11 @@
+dependencies {
+    implementation project(':common-lib')
+    implementation project(':event-lib')
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'com.twilio.sdk:twilio:10.1.0'
+}
+
+springBoot {
+    mainClass = 'com.ticketbooking.notification.NotificationServiceApplication'
+}

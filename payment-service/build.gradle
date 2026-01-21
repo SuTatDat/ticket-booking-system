@@ -1,0 +1,10 @@
+dependencies {
+    implementation project(':common-lib')
+    implementation project(':event-lib')
+    implementation 'com.stripe:stripe-java:24.0.0'
+    implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.2.0'
+}
+
+springBoot {
+    mainClass = 'com.ticketbooking.payment.PaymentServiceApplication'
+}

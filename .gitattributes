@@ -1,0 +1,88 @@
+# ====================================
+# Auto detect text files and normalize line endings
+# ====================================
+* text=auto
+
+# ====================================
+# Java sources
+# ====================================
+*.java text diff=java
+*.kt text diff=kotlin
+*.groovy text diff=java
+*.scala text diff=java
+
+# ====================================
+# Build files
+# ====================================
+*.gradle text diff=java
+*.gradle.kts text diff=kotlin
+gradlew text eol=lf
+*.bat text eol=crlf
+
+# ====================================
+# Config files
+# ====================================
+*.yml text
+*.yaml text
+*.xml text
+*.properties text
+*.json text
+
+# ====================================
+# Documentation
+# ====================================
+*.md text diff=markdown
+*.txt text
+*.csv text
+
+# ====================================
+# Scripts
+# ====================================
+*.sh text eol=lf
+*.bash text eol=lf
+*.ps1 text eol=crlf
+
+# ====================================
+# Docker
+# ====================================
+Dockerfile text
+docker-compose*.yml text
+.dockerignore text
+
+# ====================================
+# Binary files (no diff)
+# ====================================
+*.jar binary
+*.war binary
+*.ear binary
+*.class binary
+*.dll binary
+*.exe binary
+*.so binary
+*.dylib binary
+
+# Images
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg text
+
+# Fonts
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+
+# Archives
+*.zip binary
+*.tar binary
+*.gz binary
+*.7z binary
+*.rar binary
+
+# ====================================
+# Gradle wrapper (keep as-is)
+# ====================================
+gradle/wrapper/gradle-wrapper.jar binary
