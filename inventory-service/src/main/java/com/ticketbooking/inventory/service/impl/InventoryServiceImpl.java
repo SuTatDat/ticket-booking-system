@@ -14,6 +14,7 @@ import com.ticketbooking.inventory.repository.EventRepository;
 import com.ticketbooking.inventory.repository.SeatRepository;
 import com.ticketbooking.inventory.repository.TicketTypeRepository;
 import com.ticketbooking.inventory.service.InventoryService;
+import com.ticketbooking.inventory.service.SeatCacheService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ public class InventoryServiceImpl implements InventoryService {
     private final TicketTypeRepository ticketTypeRepository;
     private final SeatRepository seatRepository;
     private final InventoryMapper inventoryMapper;
+    private final SeatCacheService seatCacheService;
 
     @Override
     @Transactional
@@ -107,12 +109,39 @@ public class InventoryServiceImpl implements InventoryService {
         return inventoryMapper.toTicketTypeResponseList(ticketTypes);
     }
 
+    /**
+     * Get available seats for an event with Redis caching.
+     *
+     * Flow (as per sequence diagram - Phase 1: View Available Seats):
+     * 1. getFromCache(eventId) - Try to get from Redis cache
+     * 2. If Cache Hit - Return cached seats immediately
+     * 3. If Cache Miss - Query MySQL: findAvailableByEventId(eventId)
+     * 4. cacheSeats(eventId, seats) - Store result in Redis
+     * 5. Return seats with availability info
+     */
     @Override
     public List<SeatResponse> getAvailableSeats(Long eventId, Long ticketTypeId) {
         log.info("Fetching available seats for event: {}, ticketTypeId: {}", eventId, ticketTypeId);
 
+        // Validate event exists
         findEventById(eventId);
 
+        // Step 1: Try to get from cache
+        List<SeatResponse> cachedSeats;
+        if (ticketTypeId != null) {
+            cachedSeats = seatCacheService.getFromCache(eventId, ticketTypeId);
+        } else {
+            cachedSeats = seatCacheService.getFromCache(eventId);
+        }
+
+        // Step 2: Cache Hit - return cached seats
+        if (cachedSeats != null) {
+            log.debug("Returning {} cached seats for eventId: {}", cachedSeats.size(), eventId);
+            return cachedSeats;
+        }
+
+        // Step 3: Cache Miss - query database
+        log.debug("Cache miss, querying database for eventId: {}", eventId);
         List<Seat> seats;
         if (ticketTypeId != null) {
             seats = seatRepository.findByEventIdAndTicketTypeIdAndStatus(
@@ -121,8 +150,21 @@ public class InventoryServiceImpl implements InventoryService {
             seats = seatRepository.findByEventIdAndStatus(eventId, Seat.SeatStatus.AVAILABLE);
         }
 
-        return inventoryMapper.toSeatResponseList(seats);
+        // Convert to response
+        List<SeatResponse> seatResponses = inventoryMapper.toSeatResponseList(seats);
+
+        // Step 4: Cache the result
+        if (ticketTypeId != null) {
+            seatCacheService.cacheSeats(eventId, ticketTypeId, seatResponses);
+        } else {
+            seatCacheService.cacheSeats(eventId, seatResponses);
+        }
+
+        // Step 5: Return seats (with availability)
+        log.debug("Returning {} seats from database for eventId: {}", seatResponses.size(), eventId);
+        return seatResponses;
     }
+
 
     @Override
     public SeatResponse getSeat(Long seatId) {

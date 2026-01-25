@@ -51,6 +51,11 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
+inventory:
+  cache:
+    seats:
+      ttl-minutes: ${SEAT_CACHE_TTL_MINUTES:5}
+
 # Actuator
 management:
   endpoints:
