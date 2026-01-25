@@ -66,7 +66,7 @@ subprojects {
 
 // Task to build all services
 tasks.register('buildAllServices') {
-    dependsOn subprojects.findAll { it.path.startsWith(':services:') }.collect { "${it.path}:build" }
+    dependsOn subprojects.findAll { it.name.endsWith('-service') }.collect { "${it.path}:build" }
     doLast {
         println 'All services built successfully!'
     }
@@ -74,7 +74,7 @@ tasks.register('buildAllServices') {
 
 // Task to run tests for all services
 tasks.register('testAllServices') {
-    dependsOn subprojects.findAll { it.path.startsWith(':services:') }.collect { "${it.path}:test" }
+    dependsOn subprojects.findAll { it.name.endsWith('-service') }.collect { "${it.path}:test" }
     doLast {
         println 'All service tests completed!'
     }

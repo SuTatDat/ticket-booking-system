@@ -5,7 +5,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {
+        "com.ticketbooking.booking",
+        "com.ticketbooking.common"
+})
 @EnableFeignClients
 @EnableScheduling
 public class BookingServiceApplication {
